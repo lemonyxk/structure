@@ -8,7 +8,7 @@ var t = &Tire{}
 
 func init() {
 	t.Insert("/hello/:username/:addr/", "xixi2")
-	t.Insert("/hello/:username/:adda/aa", "xixi1")
+	t.Insert("/hello/:username/:adda", "xixi1")
 	t.Insert("/hello/:username/:adda/b", 1)
 	t.Insert("/hello/:username/:adda/c", 2)
 	t.Insert("/hello/:username/:adda/d", 3)
@@ -18,7 +18,7 @@ func init() {
 
 }
 
-var p = []byte("/a/1/2/1/ddsadasdsadsadsdsadsaddsadasdsadsadsdsadsa")
+var p = []byte("/hello/world/haha")
 
 func BenchmarkMyTire(b *testing.B) {
 	for i := 0; i < b.N; i++ {
@@ -30,8 +30,8 @@ func BenchmarkMyTire(b *testing.B) {
 var n1 = new(node)
 
 func init() {
-	// n.addRoute("/hello/:username/:addr/", "xixi2")
-	n1.addRoute("/hello/:username/:adda/aa", "xixi1")
+	// n1.addRoute("/hello/:username/:addr/hello", "xixi2")
+	n1.addRoute("/hello/:username/:adda", "xixi1")
 	n1.addRoute("/hello/:username/:adda/b", 1)
 	n1.addRoute("/hello/:username/:adda/c", 2)
 	n1.addRoute("/hello/:username/:adda/d", 3)
@@ -42,6 +42,6 @@ func init() {
 
 func BenchmarkTireTest(b *testing.B) {
 	for i := 0; i < b.N; i++ {
-		n1.getValue("/a/1/2/1/ddsadasdsadsadsdsadsaddsadasdsadsadsdsadsa")
+		n1.getValue("/hello/world/haha")
 	}
 }

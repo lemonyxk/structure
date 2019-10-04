@@ -78,7 +78,7 @@ func (t *Tire) Insert(path string, data interface{}) {
 	}
 
 	// repeat router
-	if h := t.GetValue(pathBytes); h != nil {
+	if h := getFormatValue(t, formatPath(pathBytes)); h != nil {
 		panic(fmt.Sprintf("%s is conflict with %s", path, h.Path))
 	}
 
@@ -148,6 +148,76 @@ func (t *Tire) Insert(path string, data interface{}) {
 	}
 
 	t = t1
+
+}
+
+func formatPath(pathBytes []byte) []byte {
+
+	if pathBytes == nil || len(pathBytes) == 0 {
+		return nil
+	}
+
+	if pathBytes[0] != XG {
+		return nil
+	}
+
+	if len(pathBytes) == 1 {
+		return []byte{XG}
+	}
+
+	var res []byte
+
+	var s = true
+
+	for index := range pathBytes {
+		var c = pathBytes[index]
+
+		if c == FH && pathBytes[index-1] == XG {
+			res = append(res, c)
+			s = false
+			continue
+		}
+
+		if c == XG {
+			s = true
+		}
+
+		if s == true {
+			res = append(res, pathBytes[index])
+		}
+	}
+
+	return res
+}
+
+func getFormatValue(t *Tire, pathBytes []byte) *Tire {
+
+	var n = t.children
+
+	if t.childrenCount == 0 {
+		return nil
+	}
+
+	for index := range pathBytes {
+
+		var c = pathBytes[index]
+
+		if n[c] == nil {
+			return nil
+		}
+
+		if n[c].char != 0 {
+
+			if index == len(pathBytes)-1 && n[c].Path != nil {
+				return n[c]
+			}
+
+			n = n[c].children
+		}
+
+	}
+
+	return nil
 
 }
 

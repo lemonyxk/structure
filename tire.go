@@ -19,7 +19,6 @@ const FH uint8 = 58
 const XG uint8 = 47
 const SC uint8 = 255
 const WH uint8 = 63
-const XH uint8 = 42
 
 type Tire struct {
 	children      *[SC]*Tire
@@ -145,6 +144,7 @@ func (t *Tire) Insert(path string, data interface{}) {
 		t = p
 		k = nil
 		s = true
+
 	}
 
 	t = t1
@@ -185,6 +185,7 @@ func formatPath(pathBytes []byte) []byte {
 		if s == true {
 			res = append(res, pathBytes[index])
 		}
+
 	}
 
 	return res
@@ -236,10 +237,14 @@ func (t *Tire) GetValue(pathBytes []byte) *Tire {
 	for index := range pathBytes {
 
 		// c == : ?
-		if pathBytes[index] == FH {
+
+		var c = pathBytes[index]
+
+		if c == FH {
 
 			// is the latest char ?
 			if index == bLen {
+
 				if n[FH] != nil && n[FH].Path != nil {
 					return n[FH]
 				}
@@ -250,12 +255,12 @@ func (t *Tire) GetValue(pathBytes []byte) *Tire {
 			continue
 		}
 
-		if n[pathBytes[index]] == nil || f == false {
+		if n[c] == nil || f == false {
 
 			f = false
 
 			// is /
-			if pathBytes[index] == XG {
+			if c == XG {
 
 				// is the latest char ?
 				if index == bLen {
@@ -290,6 +295,8 @@ func (t *Tire) GetValue(pathBytes []byte) *Tire {
 				// reset n
 				n = n[FH].children[XG].children
 
+				f = true
+
 				continue
 
 			}
@@ -310,12 +317,14 @@ func (t *Tire) GetValue(pathBytes []byte) *Tire {
 			continue
 		}
 
-		if n[pathBytes[index]].char != 0 {
-			if index == bLen && n[pathBytes[index]].Path != nil {
-				return n[pathBytes[index]]
+		if n[c].char != 0 {
+			if index == bLen && n[c].Path != nil {
+				return n[c]
 			}
 
-			n = n[pathBytes[index]].children
+			n = n[c].children
+
+			f = true
 		}
 	}
 

@@ -14,22 +14,20 @@ func main() {
 
 	var t = &tire.Tire{}
 
-	// t.Insert("/:username/lemo/:addr/", "xixi2")
-	// t.Insert("/hell/:username/:adda/c/:xixi/:haha", 2)
-	// t.Insert("/hello/:username/:adda/aa", "xixi1")
-	// t.Insert("/hello/:username/:adda/b", 1)
-	// t.Insert("/hello/:username/:adda/d", 3)
-	// t.Insert("/hello/:username/:adda/e", 4)
-	// t.Insert("/hello/:username/:adda/:f", 5)
-	// t.Insert("/:1/:21", 6)
-	t.Insert("/debug/pprof/:tip", 6)
-	t.Insert("/debug/pprof/profile", 6)
+	t.Insert("/hello/:username/:addr/", "xixi2")
+	t.Insert("/hello/:username/:adda", "xixi1")
+	t.Insert("/hello/:username/:adda/b", 1)
+	t.Insert("/hello/:username/:adda/c", 2)
+	t.Insert("/hello/:username/:adda/d", 3)
+	t.Insert("/hello/:username/:adda/e", 4)
+	t.Insert("/hello/:username/:adda/f", 5)
+	t.Insert("/a/:1/2/:2/:2", 6)
 
-	var p = []byte("/debug/pprof/:")
+	var p = []byte("/a/1/2/1/ddsadasdsadsadsdsadsaddsadasdsadsadsdsadsa")
 
 	if t.GetValue(p) != nil {
-		log.Println(string(t.GetValue(p).Path))
-
+		log.Println(t.GetValue(p).ParseParams(p))
+		log.Println(string(t.GetValue(p).Path), t.GetValue(p).Keys)
 		log.Println([]byte("*"))
 	}
 

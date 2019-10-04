@@ -231,6 +231,8 @@ func (t *Tire) GetValue(pathBytes []byte) *Tire {
 
 	var bLen = len(pathBytes) - 1
 
+	var f = true
+
 	for index := range pathBytes {
 
 		// c == : ?
@@ -248,7 +250,9 @@ func (t *Tire) GetValue(pathBytes []byte) *Tire {
 			continue
 		}
 
-		if n[pathBytes[index]] == nil {
+		if n[pathBytes[index]] == nil || f == false {
+
+			f = false
 
 			// is /
 			if pathBytes[index] == XG {

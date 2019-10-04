@@ -23,11 +23,14 @@ func main() {
 	// t.Insert("/hello/:username/:adda/:f", 5)
 	// t.Insert("/:1/:21", 6)
 	t.Insert("/debug/pprof/:tip", 6)
+	t.Insert("/debug/pprof/profile", 6)
 
-	var p = []byte("/debug/pprof/heap")
+	var p = []byte("/debug/pprof/:")
 
-	log.Println(string(t.GetValue(p).Path))
+	if t.GetValue(p) != nil {
+		log.Println(string(t.GetValue(p).Path))
 
-	log.Println([]byte("*"))
+		log.Println([]byte("*"))
+	}
 
 }

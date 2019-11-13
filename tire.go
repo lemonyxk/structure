@@ -93,6 +93,10 @@ func (t *Tire) Insert(path string, data interface{}) {
 
 		var c = pathBytes[index]
 
+		//if c > SC {
+		//	panic(fmt.Sprintf("%s include special characters %s", path, string(c)))
+		//}
+
 		if c == FH && (index != 0 && pathBytes[index-1] == XG) {
 			s = false
 			if index == len(pathBytes)-1 || (index != 0 && pathBytes[index+1] == XG) {
@@ -329,4 +333,59 @@ func (t *Tire) GetValue(pathBytes []byte) *Tire {
 	}
 
 	return nil
+}
+
+func (t *Tire) GetAllValue() []*Tire {
+
+	var stack = newStack()
+
+	if t.children != nil {
+		stack.push(t.children)
+	}
+
+	var res []*Tire
+
+	for {
+
+		var p, ok = stack.pop()
+		if !ok {
+			break
+		}
+
+		for i := 0; i < len(p); i++ {
+			if p[i] != nil {
+				if p[i].Data != nil {
+					res = append(res, p[i])
+				}
+				stack.push(p[i].children)
+			}
+		}
+	}
+
+	return res
+}
+
+type stack struct {
+	list []*[SC]*Tire
+}
+
+func newStack() *stack {
+	return &stack{}
+}
+
+func (s *stack) pop() (*[SC]*Tire, bool) {
+	if len(s.list) == 0 {
+		return nil, false
+	}
+	var value = s.list[len(s.list)-1]
+	s.list = s.list[:len(s.list)-1]
+	return value, true
+}
+
+func (s *stack) push(v *[SC]*Tire) {
+	s.list = append(s.list, v)
+}
+
+func (s *stack) isEmpty() bool {
+	return len(s.list) == 0
 }

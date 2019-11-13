@@ -18,7 +18,7 @@ func init() {
 
 }
 
-var p = []byte("/a/1/2/1/ddsadasdsadsadsdsadsaddsadasdsadsadsdsadsa")
+var p = []byte("/hello/1/2")
 
 func BenchmarkMyTire(b *testing.B) {
 	for i := 0; i < b.N; i++ {
@@ -42,6 +42,6 @@ func init() {
 
 func BenchmarkTireTest(b *testing.B) {
 	for i := 0; i < b.N; i++ {
-		n1.getValue("/a/1/2/1/ddsadasdsadsadsdsadsaddsadasdsadsadsdsadsa")
+		n1.getValue(string(p))
 	}
 }

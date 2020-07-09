@@ -1,8 +1,11 @@
 package main
 
 import (
-	"github.com/Lemo-yxk/tire"
+	// "github.com/Lemo-yxk/structure/tire"
+
 	"log"
+
+	"github.com/Lemo-yxk/structure/tire"
 )
 
 func init() {
@@ -27,11 +30,11 @@ func main() {
 
 	log.Println(t.GetValue([]byte("/*(我")).Data)
 	//
-	//if t.GetValue(p) != nil {
+	// if t.GetValue(p) != nil {
 	//	log.Println(t.GetValue(p).ParseParams(p))
 	//	log.Println(string(t.GetValue(p).Path), t.GetValue(p).Keys)
 	//	log.Println([]byte("*"))
-	//}
+	// }
 
 	for _, value := range t.GetAllValue() {
 		log.Println(string(value.Path), value.Data)

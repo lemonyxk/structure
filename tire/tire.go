@@ -1,11 +1,11 @@
 /**
-* @program: tire-tree
+* @program: lemo
 *
 * @description:
 *
-* @author: Lemo-yxk
+* @author: lemo
 *
-* @create: 2019-09-24 15:42
+* @create: 2019-12-26 19:12
 **/
 
 package tire
@@ -13,6 +13,7 @@ package tire
 import (
 	"fmt"
 	"strings"
+	"unsafe"
 )
 
 const FH uint8 = 58
@@ -35,7 +36,7 @@ func (t *Tire) ParseParams(pathBytes []byte) []string {
 		return nil
 	}
 
-	var pathArray = strings.Split(string(pathBytes), "/")
+	var pathArray = strings.Split(bytesToString(pathBytes), "/")
 
 	var res []string
 
@@ -65,7 +66,7 @@ func (t *Tire) Insert(path string, data interface{}) {
 		return
 	}
 
-	var pathBytes = []byte(path)
+	var pathBytes = stringToBytes(path)
 
 	if pathBytes[0] != XG {
 		return
@@ -93,9 +94,9 @@ func (t *Tire) Insert(path string, data interface{}) {
 
 		var c = pathBytes[index]
 
-		//if c > SC {
+		// if c > SC {
 		//	panic(fmt.Sprintf("%s include special characters %s", path, string(c)))
-		//}
+		// }
 
 		if c == FH && (index != 0 && pathBytes[index-1] == XG) {
 			s = false
@@ -119,7 +120,7 @@ func (t *Tire) Insert(path string, data interface{}) {
 		}
 
 		if k != nil {
-			ka = append(ka, string(k))
+			ka = append(ka, bytesToString(k))
 		}
 
 		var p *Tire
@@ -335,57 +336,32 @@ func (t *Tire) GetValue(pathBytes []byte) *Tire {
 	return nil
 }
 
-func (t *Tire) GetAllValue() []*Tire {
-
-	var stack = newStack()
-
-	if t.children != nil {
-		stack.push(t.children)
+func fn(node *Tire, res *[]*Tire) {
+	if node == nil {
+		return
 	}
-
-	var res []*Tire
-
-	for {
-
-		var p, ok = stack.pop()
-		if !ok {
-			break
-		}
-
-		for i := 0; i < len(p); i++ {
-			if p[i] != nil {
-				if p[i].Data != nil {
-					res = append(res, p[i])
-				}
-				stack.push(p[i].children)
+	for i := 0; i < len(node.children); i++ {
+		if node.children[i] != nil {
+			if node.children[i].Data != nil {
+				*res = append(*res, node.children[i])
 			}
+			fn(node.children[i], res)
 		}
 	}
+}
 
+func stringToBytes(s string) []byte {
+	x := (*[2]uintptr)(unsafe.Pointer(&s))
+	h := [3]uintptr{x[0], x[1], x[1]}
+	return *(*[]byte)(unsafe.Pointer(&h))
+}
+
+func bytesToString(b []byte) string {
+	return *(*string)(unsafe.Pointer(&b))
+}
+
+func (t *Tire) GetAllValue() []*Tire {
+	var res []*Tire
+	fn(t, &res)
 	return res
-}
-
-type stack struct {
-	list []*[SC]*Tire
-}
-
-func newStack() *stack {
-	return &stack{}
-}
-
-func (s *stack) pop() (*[SC]*Tire, bool) {
-	if len(s.list) == 0 {
-		return nil, false
-	}
-	var value = s.list[len(s.list)-1]
-	s.list = s.list[:len(s.list)-1]
-	return value, true
-}
-
-func (s *stack) push(v *[SC]*Tire) {
-	s.list = append(s.list, v)
-}
-
-func (s *stack) isEmpty() bool {
-	return len(s.list) == 0
 }

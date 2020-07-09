@@ -1,3 +1,3 @@
-module github.com/Lemo-yxk/tire
+module github.com/Lemo-yxk/structure
 
-go 1.13
+go 1.15

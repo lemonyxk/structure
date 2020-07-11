@@ -1,3 +1,3 @@
-module github.com/Lemo-yxk/structure
+module github.com/lemoyxk/structure
 
 go 1.15

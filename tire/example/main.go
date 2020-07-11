@@ -1,11 +1,11 @@
 package main
 
 import (
-	// "github.com/Lemo-yxk/structure/tire"
+	// "github.com/lemoyxk/structure/tire"
 
 	"log"
 
-	"github.com/Lemo-yxk/structure/tire"
+	"github.com/lemoyxk/structure/tire"
 )
 
 func init() {

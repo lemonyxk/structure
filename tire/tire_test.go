@@ -23,6 +23,7 @@ var p = []byte("/hello/1/2")
 func BenchmarkMyTire(b *testing.B) {
 	for i := 0; i < b.N; i++ {
 		t.GetValue(p)
+		// t.Insert("/hello/:username/:addr/", "xixi2")
 		// t.ParseParams(p)
 	}
 }

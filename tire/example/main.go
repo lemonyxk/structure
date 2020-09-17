@@ -26,15 +26,30 @@ func main() {
 	t.Insert("/a/:1/2/:2/:2", 6)
 	t.Insert("/b/:1/2/:2/:2", 7)
 	t.Insert("/c/:1/2/:2/:2", 9)
-	t.Insert("/*(我", 9)
+	t.Insert("/*(21", 9)
 
-	log.Println(t.GetValue([]byte("/*(我")).Data)
+	// log.Println(t.GetValue([]byte("/*(21")))
+
 	//
 	// if t.GetValue(p) != nil {
 	//	log.Println(t.GetValue(p).ParseParams(p))
 	//	log.Println(string(t.GetValue(p).Path), t.GetValue(p).Keys)
 	//	log.Println([]byte("*"))
 	// }
+
+	for _, value := range t.GetAllValue() {
+		log.Println(string(value.Path), value.Data)
+	}
+
+	t.Delete("/hello/:username/:addr/")
+	t.Delete("/hello/:username/:adda")
+	t.Delete("/hello/:username/:adda/b")
+	t.Delete("/hello/:username/:adda/c")
+	t.Delete("/hello/:username/:adda/d")
+	t.Delete("/hello/:username/:adda/e")
+	t.Delete("/hello/:username/:adda/f")
+
+	log.Println("-----------")
 
 	for _, value := range t.GetAllValue() {
 		log.Println(string(value.Path), value.Data)

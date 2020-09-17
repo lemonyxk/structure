@@ -23,6 +23,7 @@ const WH uint8 = 63
 
 type Tire struct {
 	children      *[SC]*Tire
+	parent        *Tire
 	char          byte
 	childrenCount uint8
 	Keys          []string
@@ -133,6 +134,7 @@ func (t *Tire) Insert(path string, data interface{}) {
 			p = t.children[c]
 		} else {
 			p = new(Tire)
+			p.parent = t
 			p.children = &[SC]*Tire{}
 			p.char = c
 		}
@@ -225,6 +227,27 @@ func getFormatValue(t *Tire, pathBytes []byte) *Tire {
 
 	return nil
 
+}
+
+func (t *Tire) Delete(path string) {
+	var pathBytes = stringToBytes(path)
+
+	var node = t.GetValue(pathBytes)
+
+	if node == nil {
+		return
+	}
+
+	for {
+
+		node.parent.children[node.char] = nil
+
+		node = node.parent
+
+		if node.childrenCount != 0 {
+			break
+		}
+	}
 }
 
 func (t *Tire) GetValue(pathBytes []byte) *Tire {

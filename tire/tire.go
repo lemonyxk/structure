@@ -37,7 +37,7 @@ func (t *Tire) ParseParams(pathBytes []byte) []string {
 		return nil
 	}
 
-	var pathArray = strings.Split(bytesToString(pathBytes), "/")
+	var pathArray = strings.Split(bytesToString(pathBytes), string(XG))
 
 	var res []string
 
@@ -64,13 +64,13 @@ func (t *Tire) ParseParams(pathBytes []byte) []string {
 func (t *Tire) Insert(path string, data interface{}) {
 
 	if path == "" {
-		return
+		panic("path is empty")
 	}
 
 	var pathBytes = stringToBytes(path)
 
 	if pathBytes[0] != XG {
-		return
+		panic(fmt.Sprintf("path must start with [%s]", string(XG)))
 	}
 
 	// include ?

@@ -15,10 +15,16 @@ func init() {
 	t.Insert("/hello/:username/:adda/e", 4)
 	t.Insert("/hello/:username/:adda/f", 5)
 	t.Insert("/a/:1/2/:2/:2", 6)
-
 }
 
 var p = []byte("/hello/1/2")
+
+func BenchmarkMyTireRemove(b *testing.B) {
+	for i := 0; i < b.N; i++ {
+		t.Insert("/a/b", 6)
+		t.Delete("/a/b")
+	}
+}
 
 func BenchmarkMyTire(b *testing.B) {
 	for i := 0; i < b.N; i++ {

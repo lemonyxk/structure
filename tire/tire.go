@@ -13,6 +13,7 @@ package tire
 import (
 	"fmt"
 	"strings"
+	"sync"
 	"unsafe"
 )
 
@@ -20,6 +21,8 @@ const FH uint8 = 58
 const XG uint8 = 47
 const SC uint8 = 255
 const WH uint8 = 63
+
+var mux sync.Mutex
 
 type Tire struct {
 	children      *[SC]*Tire
@@ -62,6 +65,9 @@ func (t *Tire) ParseParams(pathBytes []byte) []string {
 }
 
 func (t *Tire) Insert(path string, data interface{}) {
+
+	mux.Lock()
+	defer mux.Unlock()
 
 	if path == "" {
 		panic("path is empty")
@@ -230,6 +236,10 @@ func getFormatValue(t *Tire, pathBytes []byte) *Tire {
 }
 
 func (t *Tire) Delete(path string) {
+
+	mux.Lock()
+	defer mux.Unlock()
+
 	var pathBytes = stringToBytes(path)
 
 	var node = t.GetValue(pathBytes)

@@ -30,6 +30,11 @@ func main() {
 	// 	}()
 	// }
 
+	// var timeWheel = timewheel.NewTimeWheel(10).Start()
+	// timeWheel.Ticker(10*time.Millisecond, func() {
+	// 	log.Println(timeWheel, time.Now().Format("15:04:05.000"))
+	// })
+
 	select {}
 
 	// log.Println(getPosition(time.Second * 86400))

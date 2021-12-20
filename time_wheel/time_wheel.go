@@ -11,6 +11,7 @@
 package timewheel
 
 import (
+	"fmt"
 	"sync"
 	"time"
 )
@@ -125,6 +126,26 @@ func (tw *TimeWheel) Stop() {
 	tw.isRunning = false
 }
 
+func (tw *TimeWheel) String() string {
+	return fmt.Sprintf("%02d:%02d:%02d.%03d", tw.cal.hour, tw.cal.min, tw.cal.sec, tw.cal.ms*acc)
+}
+
+func (tw *TimeWheel) Mill() int {
+	return tw.cal.ms * acc
+}
+
+func (tw *TimeWheel) Sec() int {
+	return tw.cal.sec
+}
+
+func (tw *TimeWheel) Min() int {
+	return tw.cal.min
+}
+
+func (tw *TimeWheel) Hour() int {
+	return tw.cal.hour
+}
+
 func (tw *TimeWheel) Start() *TimeWheel {
 
 	tw.tMux.Lock()
@@ -135,6 +156,17 @@ func (tw *TimeWheel) Start() *TimeWheel {
 	}
 
 	tw.isRunning = true
+
+	var now = time.Now()
+
+	var subMill = acc - now.Nanosecond()/1e6%acc
+
+	time.Sleep(time.Duration(subMill) * time.Millisecond)
+
+	tw.cal.ms = (now.Nanosecond()/1e6 + subMill) / acc
+	tw.cal.sec = now.Second()
+	tw.cal.min = now.Minute()
+	tw.cal.hour = now.Hour()
 
 	var ticker = time.NewTicker(time.Millisecond * time.Duration(acc))
 

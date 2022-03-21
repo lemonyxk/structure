@@ -10,7 +10,7 @@
 
 package main
 
-import "github.com/lemoyxk/structure/v3/head"
+import "github.com/lemonyxk/structure/v3/head"
 
 func main() {
 

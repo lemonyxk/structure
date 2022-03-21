@@ -24,7 +24,7 @@ const WH uint8 = 63
 
 var mux sync.Mutex
 
-func NewTire[T any]() *Tire[T] {
+func New[T any]() *Tire[T] {
 	return &Tire[T]{}
 }
 

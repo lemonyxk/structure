@@ -13,7 +13,7 @@ package main
 import (
 	"log"
 
-	"github.com/lemoyxk/structure/v3/queue"
+	"github.com/lemonyxk/structure/v3/queue"
 )
 
 func main() {
@@ -29,7 +29,7 @@ func main() {
 
 	log.Println(a, b)
 
-	var p1 = queue.NewQueue(6, 1, 2, 3, 4, 5)
+	var p1 = queue.New(6, 1, 2, 3, 4, 5)
 
 	for {
 		v, ok := p1.Pop()

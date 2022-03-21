@@ -35,7 +35,7 @@ type TimeWheel struct {
 	isRunning bool
 }
 
-func NewTimeWheel(accuracy int) *TimeWheel {
+func New(accuracy int) *TimeWheel {
 	// suggest 10 or 100 ms
 	if accuracy < 0 || accuracy > 1000 {
 		panic("accuracy must between 1-1000 ms")

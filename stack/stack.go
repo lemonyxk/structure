@@ -14,7 +14,7 @@ type stack[T any] struct {
 	list []T
 }
 
-func NewStack[T any](list ...T) *stack[T] {
+func New[T any](list ...T) *stack[T] {
 	return &stack[T]{list: list}
 }
 

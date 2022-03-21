@@ -10,7 +10,7 @@
 
 package queue
 
-func NewQueue[T any](list ...T) *queue[T] {
+func New[T any](list ...T) *queue[T] {
 	return &queue[T]{list: list}
 }
 

@@ -15,7 +15,7 @@ import (
 	"time"
 )
 
-var timeWheel = NewTimeWheel(10).Start()
+var timeWheel = New(10).Start()
 
 // for i := 0; i < 100000; i++ {
 // 	time.AfterFunc(time.Millisecond * 10 * time.Duration(i+1), func() {

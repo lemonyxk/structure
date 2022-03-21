@@ -13,7 +13,7 @@ package main
 import (
 	"log"
 
-	"github.com/lemoyxk/structure/v3/pool"
+	"github.com/lemonyxk/structure/v3/pool"
 )
 
 func main() {

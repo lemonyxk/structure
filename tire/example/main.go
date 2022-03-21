@@ -5,7 +5,7 @@ import (
 
 	"log"
 
-	"github.com/lemoyxk/structure/v3/tire"
+	"github.com/lemonyxk/structure/v3/tire"
 )
 
 func init() {

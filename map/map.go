@@ -51,3 +51,15 @@ func (h *Hash[K, V]) Clear() {
 	h.m = make(map[K]V)
 	h.mux.Unlock()
 }
+
+func (h *Hash[K, V]) Range(fn func(k K, v V) bool) {
+	h.mux.Lock()
+	defer h.mux.Unlock()
+	for k, v := range h.m {
+		h.mux.Unlock()
+		if !fn(k, v) {
+			break
+		}
+		h.mux.Lock()
+	}
+}

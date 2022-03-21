@@ -4,11 +4,11 @@ import (
 	"testing"
 )
 
-var t = &Tire{}
+var t = &Tire[int]{}
 
 func init() {
-	t.Insert("/hello/:username/:addr/", "xixi2")
-	t.Insert("/hello/:username/:adda", "xixi1")
+	t.Insert("/hello/:username/:addr/", 0)
+	t.Insert("/hello/:username/:adda", -111)
 	t.Insert("/hello/:username/:adda/b", 1)
 	t.Insert("/hello/:username/:adda/c", 2)
 	t.Insert("/hello/:username/:adda/d", 3)

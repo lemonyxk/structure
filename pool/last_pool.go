@@ -5,13 +5,13 @@ import (
 	"sync"
 )
 
-type LastPoolConfig struct {
+type LastPoolConfig[T any] struct {
 	Max int
 	Min int
-	New func() interface{}
+	New func() T
 }
 
-func NewLastPool(config LastPoolConfig) *lastPool {
+func NewLastPool[T any](config LastPoolConfig[T]) *lastPool[T] {
 
 	if config.Max <= 0 {
 		config.Max = runtime.NumCPU() * 2
@@ -25,7 +25,7 @@ func NewLastPool(config LastPoolConfig) *lastPool {
 		config.Min = config.Max
 	}
 
-	var pool = &lastPool{}
+	var pool = &lastPool[T]{}
 	pool.config = config
 	pool.status = lastPoolStatus{max: config.Max, min: config.Min, len: 0}
 
@@ -42,14 +42,14 @@ type lastPoolStatus struct {
 	len int
 }
 
-type lastPool struct {
+type lastPool[T any] struct {
 	mux     sync.RWMutex
-	storage []interface{}
-	config  LastPoolConfig
+	storage []T
+	config  LastPoolConfig[T]
 	status  lastPoolStatus
 }
 
-func (pool *lastPool) Put(v interface{}) {
+func (pool *lastPool[T]) Put(v T) {
 
 	if len(pool.storage) >= pool.config.Max {
 		return
@@ -67,7 +67,7 @@ func (pool *lastPool) Put(v interface{}) {
 	pool.mux.Unlock()
 }
 
-func (pool *lastPool) Get() interface{} {
+func (pool *lastPool[T]) Get() T {
 
 	pool.mux.Lock()
 
@@ -84,6 +84,6 @@ func (pool *lastPool) Get() interface{} {
 
 }
 
-func (pool *lastPool) Status() lastPoolStatus {
+func (pool *lastPool[T]) Status() lastPoolStatus {
 	return pool.status
 }

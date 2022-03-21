@@ -5,7 +5,7 @@ import (
 
 	"log"
 
-	"github.com/lemoyxk/structure/tire"
+	"github.com/lemoyxk/structure/v3/tire"
 )
 
 func init() {
@@ -14,10 +14,10 @@ func init() {
 
 func main() {
 
-	var t = &tire.Tire{}
+	var t = &tire.Tire[int]{}
 
 	t.Insert("/hello/:username/:addr/", -1)
-	t.Insert("/hello/:username/:adda", 0)
+	t.Insert("/hello/:username/:adda", 4)
 	t.Insert("/hello/:username/:adda/b", 1)
 	t.Insert("/hello/:username/:adda/c", 2)
 	t.Insert("/hello/:username/:adda/d", 3)
@@ -28,7 +28,12 @@ func main() {
 	t.Insert("/c/:1/2/:2/:2", 9)
 	t.Insert("/*(21", 9)
 
-	// log.Println(t.GetValue([]byte("/*(21")))
+	log.Println(t.GetValue([]byte("/hello/:username/:addr/")).Data)
+
+	var a = t.GetAllValue()
+	for i := 0; i < len(a); i++ {
+		log.Println(a[i].Data, string(a[i].Path))
+	}
 
 	//
 	// if t.GetValue(p) != nil {
@@ -37,21 +42,21 @@ func main() {
 	//	log.Println([]byte("*"))
 	// }
 
-	for _, value := range t.GetAllValue() {
-		log.Println(string(value.Path), value.Data)
-	}
-
-	t.Delete("/hello/:username/:addr/")
-	t.Delete("/hello/:username/:adda")
-	t.Delete("/hello/:username/:adda/b")
-	t.Delete("/hello/:username/:adda/c")
-	t.Delete("/hello/:username/:adda/d")
-	t.Delete("/hello/:username/:adda/e")
-	t.Delete("/hello/:username/:adda/f")
-
-	log.Println("-----------")
-
-	for _, value := range t.GetAllValue() {
-		log.Println(string(value.Path), value.Data)
-	}
+	// for _, value := range t.GetAllValue() {
+	// 	log.Println(string(value.Path), value.Data)
+	// }
+	//
+	// t.Delete("/hello/:username/:addr/")
+	// t.Delete("/hello/:username/:adda")
+	// t.Delete("/hello/:username/:adda/b")
+	// t.Delete("/hello/:username/:adda/c")
+	// t.Delete("/hello/:username/:adda/d")
+	// t.Delete("/hello/:username/:adda/e")
+	// t.Delete("/hello/:username/:adda/f")
+	//
+	// log.Println("-----------")
+	//
+	// for _, value := range t.GetAllValue() {
+	// 	log.Println(string(value.Path), value.Data)
+	// }
 }

@@ -4,11 +4,10 @@ import (
 	"sync"
 )
 
-func NewBlockQueue() *blockQueue {
-	var queue = &blockQueue{}
+func NewBlockQueue[T any]() *blockQueue[T] {
+	var queue = &blockQueue[T]{}
 	queue.cond = sync.NewCond(new(sync.RWMutex))
 	queue.status = blockQueueStatus{wait: 0, len: 0}
-	queue.storage = make([]interface{}, 0)
 	return queue
 }
 
@@ -17,13 +16,13 @@ type blockQueueStatus struct {
 	len  int
 }
 
-type blockQueue struct {
+type blockQueue[T any] struct {
 	cond    *sync.Cond
-	storage []interface{}
+	storage []T
 	status  blockQueueStatus
 }
 
-func (queue *blockQueue) Push(v interface{}) {
+func (queue *blockQueue[T]) Push(v T) {
 
 	queue.cond.L.Lock()
 
@@ -37,7 +36,7 @@ func (queue *blockQueue) Push(v interface{}) {
 	queue.cond.L.Unlock()
 }
 
-func (queue *blockQueue) Pop() interface{} {
+func (queue *blockQueue[T]) Pop() T {
 
 	queue.cond.L.Lock()
 
@@ -56,6 +55,6 @@ func (queue *blockQueue) Pop() interface{} {
 	}
 }
 
-func (queue *blockQueue) Status() blockQueueStatus {
+func (queue *blockQueue[T]) Status() blockQueueStatus {
 	return queue.status
 }

@@ -10,22 +10,25 @@
 
 package head
 
-func NewMaxHead(list ...Value) *maxHead {
-	var head = &maxHead{}
+import "github.com/lemoyxk/structure/v3/constraints"
+
+func NewMaxHead[T constraints.Ordered](list ...T) *maxHead[T] {
+	var head = &maxHead[T]{}
 	head.data = list
 	head.len = len(list)
 	head.create()
 	return head
 }
 
-type maxHead struct {
-	data []Value
+type maxHead[T constraints.Ordered] struct {
+	data []T
 	len  int
 }
 
-func (h *maxHead) Pop() (Value, bool) {
+func (h *maxHead[T]) Pop() (T, bool) {
 	if h.len == 0 {
-		return nil, false
+		var t T
+		return t, false
 	}
 
 	var value = h.data[0]
@@ -39,23 +42,23 @@ func (h *maxHead) Pop() (Value, bool) {
 	return value, true
 }
 
-func (h *maxHead) Push(v Value) {
+func (h *maxHead[T]) Push(v T) {
 	h.data = append(h.data, v)
 	h.len++
 	h.up(h.len - 1)
 }
 
-func (h *maxHead) Size() int {
+func (h *maxHead[T]) Size() int {
 	return h.len
 }
 
-func (h *maxHead) create() {
+func (h *maxHead[T]) create() {
 	for i := (h.len - 2) / 2; i >= 0; i-- {
 		h.down(i)
 	}
 }
 
-func (h *maxHead) down(parentIndex int) {
+func (h *maxHead[T]) down(parentIndex int) {
 	// 暂存父节点
 	var temp = h.data[parentIndex]
 	// 子节点 默认为左节点
@@ -65,12 +68,12 @@ func (h *maxHead) down(parentIndex int) {
 
 		// 如果有右节点 则 一定有左节点
 		// 有右节点 且 右节点大于左节点 则 定位至右节点
-		if childIndex+1 < h.len && h.data[childIndex+1].Value() > h.data[childIndex].Value() {
+		if childIndex+1 < h.len && h.data[childIndex+1] > h.data[childIndex] {
 			childIndex++
 		}
 
 		// 如果父节点大于等于孩子值 则 退出
-		if temp.Value() >= h.data[childIndex].Value() {
+		if temp >= h.data[childIndex] {
 			break
 		}
 
@@ -88,7 +91,7 @@ func (h *maxHead) down(parentIndex int) {
 	h.data[parentIndex] = temp
 }
 
-func (h *maxHead) up(index int) {
+func (h *maxHead[T]) up(index int) {
 	var childIndex = index
 
 	var parentIndex = (index - 1) / 2
@@ -97,7 +100,7 @@ func (h *maxHead) up(index int) {
 
 	for childIndex > 0 {
 
-		if temp.Value() <= h.data[parentIndex].Value() {
+		if temp <= h.data[parentIndex] {
 			break
 		}
 

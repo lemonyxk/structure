@@ -24,17 +24,21 @@ const WH uint8 = 63
 
 var mux sync.Mutex
 
-type Tire struct {
-	children      *[SC]*Tire
-	parent        *Tire
+func NewTire[T any]() *Tire[T] {
+	return &Tire[T]{}
+}
+
+type Tire[T any] struct {
+	children      *[SC]*Tire[T]
+	parent        *Tire[T]
 	char          byte
 	childrenCount uint8
 	Keys          []string
 	Path          []byte
-	Data          interface{}
+	Data          T
 }
 
-func (t *Tire) ParseParams(pathBytes []byte) []string {
+func (t *Tire[T]) ParseParams(pathBytes []byte) []string {
 
 	if len(t.Keys) == 0 {
 		return nil
@@ -64,7 +68,7 @@ func (t *Tire) ParseParams(pathBytes []byte) []string {
 	return res
 }
 
-func (t *Tire) Insert(path string, data interface{}) {
+func (t *Tire[T]) Insert(path string, data T) {
 
 	mux.Lock()
 	defer mux.Unlock()
@@ -130,18 +134,18 @@ func (t *Tire) Insert(path string, data interface{}) {
 			ka = append(ka, bytesToString(k))
 		}
 
-		var p *Tire
+		var p *Tire[T]
 
 		if t.children == nil {
-			t.children = &[SC]*Tire{}
+			t.children = &[SC]*Tire[T]{}
 		}
 
 		if t.children[c] != nil {
 			p = t.children[c]
 		} else {
-			p = new(Tire)
+			p = new(Tire[T])
 			p.parent = t
-			p.children = &[SC]*Tire{}
+			p.children = &[SC]*Tire[T]{}
 			p.char = c
 		}
 
@@ -204,7 +208,7 @@ func formatPath(pathBytes []byte) []byte {
 	return res
 }
 
-func getFormatValue(t *Tire, pathBytes []byte) *Tire {
+func getFormatValue[T any](t *Tire[T], pathBytes []byte) *Tire[T] {
 
 	var n = t.children
 
@@ -235,7 +239,7 @@ func getFormatValue(t *Tire, pathBytes []byte) *Tire {
 
 }
 
-func (t *Tire) Delete(path string) {
+func (t *Tire[T]) Delete(path string) {
 
 	mux.Lock()
 	defer mux.Unlock()
@@ -260,7 +264,7 @@ func (t *Tire) Delete(path string) {
 	}
 }
 
-func (t *Tire) GetValue(pathBytes []byte) *Tire {
+func (t *Tire[T]) GetValue(pathBytes []byte) *Tire[T] {
 
 	var n = t.children
 
@@ -369,13 +373,13 @@ func (t *Tire) GetValue(pathBytes []byte) *Tire {
 	return nil
 }
 
-func fn(node *Tire, res *[]*Tire) {
+func fn[T any](node *Tire[T], res *[]*Tire[T]) {
 	if node == nil {
 		return
 	}
 	for i := 0; i < len(node.children); i++ {
 		if node.children[i] != nil {
-			if node.children[i].Data != nil {
+			if len(node.children[i].Path) != 0 {
 				*res = append(*res, node.children[i])
 			}
 			fn(node.children[i], res)
@@ -393,8 +397,8 @@ func bytesToString(b []byte) string {
 	return *(*string)(unsafe.Pointer(&b))
 }
 
-func (t *Tire) GetAllValue() []*Tire {
-	var res []*Tire
+func (t *Tire[T]) GetAllValue() []*Tire[T] {
+	var res []*Tire[T]
 	fn(t, &res)
 	return res
 }

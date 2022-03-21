@@ -10,34 +10,36 @@
 
 package queue
 
-func NewQueue(list ...interface{}) *queue {
-	return &queue{list: list}
+func NewQueue[T any](list ...T) *queue[T] {
+	return &queue[T]{list: list}
 }
 
-type queue struct {
-	list []interface{}
+type queue[T any] struct {
+	list []T
 }
 
-func (q *queue) Push(v interface{}) {
+func (q *queue[T]) Push(v T) {
 	q.list = append(q.list, v)
 }
 
-func (q *queue) Pop() (interface{}, bool) {
+func (q *queue[T]) Pop() (T, bool) {
 	if len(q.list) == 0 {
-		return nil, false
+		var t T
+		return t, false
 	}
 	var v = q.list[0]
 	q.list = q.list[1:]
 	return v, true
 }
 
-func (q *queue) Top() (interface{}, bool) {
+func (q *queue[T]) Top() (T, bool) {
 	if len(q.list) == 0 {
-		return nil, false
+		var t T
+		return t, false
 	}
 	return q.list[0], true
 }
 
-func (q *queue) Size() int {
+func (q *queue[T]) Size() int {
 	return len(q.list)
 }

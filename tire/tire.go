@@ -147,6 +147,7 @@ func (t *Tire[T]) Insert(path string, data T) {
 			p.parent = t
 			p.children = &[SC]*Tire[T]{}
 			p.char = c
+			t.childrenCount++
 		}
 
 		if index == len(pathBytes)-1 {
@@ -156,7 +157,6 @@ func (t *Tire[T]) Insert(path string, data T) {
 		}
 
 		t.children[c] = p
-		t.childrenCount++
 
 		t = p
 		k = nil
@@ -254,11 +254,12 @@ func (t *Tire[T]) Delete(path string) {
 
 	for {
 
+		node.parent.childrenCount--
 		node.parent.children[node.char] = nil
 
 		node = node.parent
 
-		if node.childrenCount != 0 {
+		if node.parent == nil || node.childrenCount != 0 {
 			break
 		}
 	}

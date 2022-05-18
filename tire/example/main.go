@@ -26,7 +26,18 @@ func main() {
 	t.Insert("/a/:1/2/:2/:2", 6)
 	t.Insert("/b/:1/2/:2/:2", 7)
 	t.Insert("/c/:1/2/:2/:2", 9)
-	t.Insert("/*(21", 9)
+
+	for i := 0; i < 300; i++ {
+		t.Delete("/*(21111111111111111")
+		t.Insert("/*(21111111111111111", 9)
+		var aa = t.GetValue([]byte("/*(21111111111111111"))
+		if aa != nil {
+			// log.Println(string(aa.Path))
+		} else {
+			log.Println("nil", i)
+			// log.Printf("%#v\n", t.GetAllValue())
+		}
+	}
 
 	log.Println(t.GetValue([]byte("/hello/:username/:addr/")).Data)
 

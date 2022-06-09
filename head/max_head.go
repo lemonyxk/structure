@@ -12,20 +12,20 @@ package head
 
 import "github.com/lemonyxk/structure/v3/constraints"
 
-func NewMaxHead[T constraints.Ordered](list ...T) *maxHead[T] {
-	var head = &maxHead[T]{}
+func NewMax[T constraints.Ordered](list ...T) *Max[T] {
+	var head = &Max[T]{}
 	head.data = list
 	head.len = len(list)
 	head.create()
 	return head
 }
 
-type maxHead[T constraints.Ordered] struct {
+type Max[T constraints.Ordered] struct {
 	data []T
 	len  int
 }
 
-func (h *maxHead[T]) Pop() (T, bool) {
+func (h *Max[T]) Pop() (T, bool) {
 	if h.len == 0 {
 		var t T
 		return t, false
@@ -42,23 +42,23 @@ func (h *maxHead[T]) Pop() (T, bool) {
 	return value, true
 }
 
-func (h *maxHead[T]) Push(v T) {
+func (h *Max[T]) Push(v T) {
 	h.data = append(h.data, v)
 	h.len++
 	h.up(h.len - 1)
 }
 
-func (h *maxHead[T]) Size() int {
+func (h *Max[T]) Size() int {
 	return h.len
 }
 
-func (h *maxHead[T]) create() {
+func (h *Max[T]) create() {
 	for i := (h.len - 2) / 2; i >= 0; i-- {
 		h.down(i)
 	}
 }
 
-func (h *maxHead[T]) down(parentIndex int) {
+func (h *Max[T]) down(parentIndex int) {
 	// 暂存父节点
 	var temp = h.data[parentIndex]
 	// 子节点 默认为左节点
@@ -91,7 +91,7 @@ func (h *maxHead[T]) down(parentIndex int) {
 	h.data[parentIndex] = temp
 }
 
-func (h *maxHead[T]) up(index int) {
+func (h *Max[T]) up(index int) {
 	var childIndex = index
 
 	var parentIndex = (index - 1) / 2

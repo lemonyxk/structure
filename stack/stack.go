@@ -10,19 +10,19 @@
 
 package stack
 
-type stack[T any] struct {
+type Stack[T any] struct {
 	list []T
 }
 
-func New[T any](list ...T) *stack[T] {
-	return &stack[T]{list: list}
+func New[T any](list ...T) *Stack[T] {
+	return &Stack[T]{list: list}
 }
 
-func (s *stack[T]) Push(v T) {
+func (s *Stack[T]) Push(v T) {
 	s.list = append(s.list, v)
 }
 
-func (s *stack[T]) Pop() (T, bool) {
+func (s *Stack[T]) Pop() (T, bool) {
 	if len(s.list) == 0 {
 		var t T
 		return t, false
@@ -32,7 +32,7 @@ func (s *stack[T]) Pop() (T, bool) {
 	return v, true
 }
 
-func (s *stack[T]) Top() (T, bool) {
+func (s *Stack[T]) Top() (T, bool) {
 	if len(s.list) == 0 {
 		var t T
 		return t, false
@@ -40,6 +40,6 @@ func (s *stack[T]) Top() (T, bool) {
 	return s.list[len(s.list)-1], true
 }
 
-func (s *stack[T]) Size() int {
+func (s *Stack[T]) Size() int {
 	return len(s.list)
 }

@@ -17,7 +17,7 @@ import (
 )
 
 func main() {
-	var p = pool.NewLastPool(pool.LastPoolConfig[any]{
+	var p = pool.New(pool.Config[any]{
 		Max: 0,
 		Min: 0,
 		New: func() any {

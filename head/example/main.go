@@ -14,7 +14,7 @@ import "github.com/lemonyxk/structure/v3/head"
 
 func main() {
 
-	var h = head.NewMaxHead(9, 15, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10)
+	var h = head.NewMax(9, 15, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10)
 
 	var s = h.Size()
 
@@ -22,7 +22,7 @@ func main() {
 		println(h.Pop())
 	}
 
-	var h1 = head.NewMaxHead(9, 15, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10)
+	var h1 = head.NewMax(9, 15, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10)
 
 	var s1 = h1.Size()
 

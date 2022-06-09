@@ -14,20 +14,20 @@ import (
 	"github.com/lemonyxk/structure/v3/constraints"
 )
 
-func NewMinHead[T constraints.Ordered](list ...T) *minHead[T] {
-	var head = &minHead[T]{}
+func NewMin[T constraints.Ordered](list ...T) *Min[T] {
+	var head = &Min[T]{}
 	head.data = list
 	head.len = len(list)
 	head.create()
 	return head
 }
 
-type minHead[T constraints.Ordered] struct {
+type Min[T constraints.Ordered] struct {
 	data []T
 	len  int
 }
 
-func (h *minHead[T]) Pop() (T, bool) {
+func (h *Min[T]) Pop() (T, bool) {
 	if h.len == 0 {
 		var t T
 		return t, false
@@ -44,23 +44,23 @@ func (h *minHead[T]) Pop() (T, bool) {
 	return value, true
 }
 
-func (h *minHead[T]) Push(v T) {
+func (h *Min[T]) Push(v T) {
 	h.data = append(h.data, v)
 	h.len++
 	h.up(h.len - 1)
 }
 
-func (h *minHead[T]) Size() int {
+func (h *Min[T]) Size() int {
 	return h.len
 }
 
-func (h *minHead[T]) create() {
+func (h *Min[T]) create() {
 	for i := (h.len - 2) / 2; i >= 0; i-- {
 		h.down(i)
 	}
 }
 
-func (h *minHead[T]) down(parentIndex int) {
+func (h *Min[T]) down(parentIndex int) {
 	// 暂存父节点
 	var temp = h.data[parentIndex]
 	// 子节点 默认为左节点
@@ -93,7 +93,7 @@ func (h *minHead[T]) down(parentIndex int) {
 	h.data[parentIndex] = temp
 }
 
-func (h *minHead[T]) up(index int) {
+func (h *Min[T]) up(index int) {
 	var childIndex = index
 
 	var parentIndex = (index - 1) / 2

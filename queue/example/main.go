@@ -17,7 +17,7 @@ import (
 )
 
 func main() {
-	var p = queue.NewBlockQueue[int]()
+	var p = queue.NewBlock[int]()
 
 	p.Push(1)
 

@@ -23,6 +23,7 @@ func New() *Scheduler {
 	var s = &Scheduler{
 		queue:  queue.NewBlock[*Worker](),
 		status: Status{running: 0},
+		limit:  0,
 	}
 
 	go s.loop()
@@ -38,27 +39,43 @@ type Scheduler struct {
 	mux    sync.Mutex
 	queue  *queue.Block[*Worker]
 	status Status
+	limit  int32
 }
 
 type Worker struct {
-	fn      func(chan struct{}, chan error)
+	fn      func()
 	timeout <-chan time.Time
 	stop    chan struct{}
+	ch      chan error
 }
 
 func (w *Worker) Stop() {
 	w.stop <- struct{}{}
 }
 
+func (w *Worker) Timeout(timeout time.Duration) *Worker {
+	w.timeout = time.After(timeout)
+	return w
+}
+
+func (w *Worker) Wait() error {
+	return <-w.ch
+}
+
 func (s *Scheduler) Status() Status {
 	return s.status
 }
 
-func (s *Scheduler) Add(fn func(chan struct{}, chan error), timeout time.Duration) *Worker {
+func (s *Scheduler) SetLimit(limit int32) {
+	s.limit = limit
+}
+
+func (s *Scheduler) Add(fn func()) *Worker {
 	w := &Worker{
 		fn:      fn,
-		timeout: time.After(timeout),
+		timeout: nil,
 		stop:    make(chan struct{}),
+		ch:      make(chan error, 1),
 	}
 
 	s.queue.Push(w)
@@ -69,7 +86,9 @@ func (s *Scheduler) Add(fn func(chan struct{}, chan error), timeout time.Duratio
 func (s *Scheduler) loop() {
 	for {
 
-		for atomic.LoadInt32(&s.status.running) > 10 {
+		if s.limit > 0 {
+			for atomic.LoadInt32(&s.status.running) >= s.limit {
+			}
 		}
 
 		var w = s.queue.Pop()
@@ -77,19 +96,20 @@ func (s *Scheduler) loop() {
 		atomic.AddInt32(&s.status.running, 1)
 
 		var sucCh = make(chan struct{}, 1)
-		var errCh = make(chan error, 1)
 
 		go func() {
-			w.fn(sucCh, errCh)
+			w.fn()
+			sucCh <- struct{}{}
 		}()
 
 		go func() {
 			select {
 			case <-w.timeout:
-				errCh <- errors.New("timeout")
+				w.ch <- errors.New("timeout")
 			case <-w.stop:
-				errCh <- errors.New("stop")
+				w.ch <- errors.New("stop")
 			case <-sucCh:
+				w.ch <- nil
 			}
 			atomic.AddInt32(&s.status.running, -1)
 		}()

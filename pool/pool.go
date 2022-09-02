@@ -28,10 +28,10 @@ func New[T any](config Config[T]) *Pool[T] {
 	var pool = &Pool[T]{}
 	pool.config = config
 	pool.status = Status{Max: config.Max, Min: config.Min, Len: 0}
-
-	if len(pool.storage) < pool.config.Min {
-		pool.storage = append(pool.storage, config.New())
-	}
+	//
+	// if len(pool.storage) < pool.config.Min {
+	// 	pool.storage = append(pool.storage, config.New())
+	// }
 
 	return pool
 }
@@ -51,11 +51,12 @@ type Pool[T any] struct {
 
 func (pool *Pool[T]) Put(v T) {
 
+	pool.mux.Lock()
+	defer pool.mux.Unlock()
+
 	if len(pool.storage) >= pool.config.Max {
 		return
 	}
-
-	pool.mux.Lock()
 
 	// if put too fast and get slowly that you will lose some put things
 	// pool not need worry
@@ -63,25 +64,21 @@ func (pool *Pool[T]) Put(v T) {
 		pool.storage = append(pool.storage, v)
 		pool.status.Len++
 	}
-
-	pool.mux.Unlock()
 }
 
 func (pool *Pool[T]) Get() T {
 
 	pool.mux.Lock()
+	defer pool.mux.Unlock()
 
 	if len(pool.storage) > 0 {
 		var r = pool.storage[0]
 		pool.storage = pool.storage[1:]
 		pool.status.Len--
-		pool.mux.Unlock()
 		return r
 	}
 
-	pool.mux.Unlock()
 	return pool.config.New()
-
 }
 
 func (pool *Pool[T]) Status() Status {

@@ -17,11 +17,11 @@ import (
 )
 
 func main() {
-	var p = pool.New(pool.Config[any]{
+	var p = pool.New(pool.Config[string]{
 		Max: 0,
 		Min: 0,
-		New: func() any {
-			return 0
+		New: func() string {
+			return ""
 		},
 	})
 
@@ -32,5 +32,4 @@ func main() {
 	a = b
 
 	log.Println(a, b)
-
 }

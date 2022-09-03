@@ -14,7 +14,7 @@ import "sync"
 
 type Hash[K comparable, V any] struct {
 	m   map[K]V
-	mux sync.Mutex
+	mux sync.RWMutex
 }
 
 func New[K comparable, V any]() *Hash[K, V] {
@@ -30,9 +30,9 @@ func (h *Hash[K, V]) Set(k K, v V) {
 }
 
 func (h *Hash[K, V]) Get(k K) V {
-	h.mux.Lock()
+	h.mux.RLock()
 	v := h.m[k]
-	h.mux.Unlock()
+	h.mux.RUnlock()
 	return v
 }
 
@@ -43,7 +43,10 @@ func (h *Hash[K, V]) Delete(k K) {
 }
 
 func (h *Hash[K, V]) Len() int {
-	return len(h.m)
+	h.mux.RLock()
+	var l = len(h.m)
+	h.mux.RUnlock()
+	return l
 }
 
 func (h *Hash[K, V]) Clear() {
@@ -53,13 +56,11 @@ func (h *Hash[K, V]) Clear() {
 }
 
 func (h *Hash[K, V]) Range(fn func(k K, v V) bool) {
-	h.mux.Lock()
-	defer h.mux.Unlock()
+	h.mux.RLock()
 	for k, v := range h.m {
-		h.mux.Unlock()
 		if !fn(k, v) {
 			break
 		}
-		h.mux.Lock()
 	}
+	h.mux.RUnlock()
 }

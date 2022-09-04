@@ -74,7 +74,7 @@ func (s *Scheduler) Add(fn func()) *Worker {
 	w := &Worker{
 		fn:      fn,
 		timeout: nil,
-		stop:    make(chan struct{}),
+		stop:    make(chan struct{}, 1),
 		ch:      make(chan error, 1),
 	}
 

@@ -1,4 +1,4 @@
-module github.com/lemonyxk/structure/v3
+module github.com/lemonyxk/structure
 
 go 1.18
 

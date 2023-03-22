@@ -11,7 +11,7 @@
 package head
 
 import (
-	"github.com/lemonyxk/structure/v3/constraints"
+	"github.com/lemonyxk/structure/constraints"
 )
 
 func NewMin[T constraints.Ordered](list ...T) *Min[T] {

@@ -13,7 +13,7 @@ package main
 import (
 	"log"
 
-	"github.com/lemonyxk/structure/v3/queue"
+	"github.com/lemonyxk/structure/queue"
 )
 
 func main() {

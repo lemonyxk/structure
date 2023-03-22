@@ -15,7 +15,7 @@ import (
 	"sync"
 	"time"
 
-	"github.com/lemonyxk/structure/v3/scheduler"
+	"github.com/lemonyxk/structure/scheduler"
 )
 
 func main() {

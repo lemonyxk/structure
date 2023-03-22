@@ -10,7 +10,7 @@
 
 package head
 
-import "github.com/lemonyxk/structure/v3/constraints"
+import "github.com/lemonyxk/structure/constraints"
 
 func NewMax[T constraints.Ordered](list ...T) *Max[T] {
 	var head = &Max[T]{}

@@ -16,7 +16,7 @@ import (
 	"sync/atomic"
 	"time"
 
-	"github.com/lemonyxk/structure/v3/queue"
+	"github.com/lemonyxk/structure/queue"
 )
 
 func New() *Scheduler {

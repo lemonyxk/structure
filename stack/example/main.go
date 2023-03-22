@@ -10,7 +10,7 @@
 
 package main
 
-import "github.com/lemonyxk/structure/v3/stack"
+import "github.com/lemonyxk/structure/stack"
 
 func main() {
 

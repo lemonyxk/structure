@@ -13,7 +13,7 @@ package main
 import (
 	"log"
 
-	hash "github.com/lemonyxk/structure/v3/map"
+	hash "github.com/lemonyxk/structure/map"
 )
 
 func main() {

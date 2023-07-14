@@ -1,11 +1,11 @@
 package main
 
 import (
-	// "github.com/lemoyxk/structure/tire"
+	// "github.com/lemoyxk/structure/trie"
 
 	"log"
 
-	"github.com/lemonyxk/structure/tire"
+	"github.com/lemonyxk/structure/trie"
 )
 
 func init() {
@@ -14,7 +14,7 @@ func init() {
 
 func main() {
 
-	var t = &tire.Tire[int]{}
+	var t = trie.New[int]()
 
 	t.Insert("/hello/:username/:addr/", -1)
 	t.Insert("/hello/:username/:adda", 4)

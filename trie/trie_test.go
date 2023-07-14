@@ -1,10 +1,10 @@
-package tire
+package trie
 
 import (
 	"testing"
 )
 
-var t = &Tire[int]{}
+var t = &trie[int]{}
 
 func init() {
 	t.Insert("/hello/:username/:addr/", 0)

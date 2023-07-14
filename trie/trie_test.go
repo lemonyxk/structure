@@ -4,7 +4,7 @@ import (
 	"testing"
 )
 
-var t = &trie[int]{}
+var t = &Trie[int]{}
 
 func init() {
 	t.Insert("/hello/:username/:addr/", 0)

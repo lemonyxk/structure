@@ -24,13 +24,13 @@ const WH uint8 = 63
 
 var mux sync.Mutex
 
-func New[T any]() *trie[T] {
-	return &trie[T]{}
+func New[T any]() *Trie[T] {
+	return &Trie[T]{}
 }
 
-type trie[T any] struct {
-	children      *[SC]*trie[T]
-	parent        *trie[T]
+type Trie[T any] struct {
+	children      *[SC]*Trie[T]
+	parent        *Trie[T]
 	char          byte
 	childrenCount uint8
 	Keys          []string
@@ -38,7 +38,7 @@ type trie[T any] struct {
 	Data          T
 }
 
-func (t *trie[T]) ParseParams(pathBytes []byte) []string {
+func (t *Trie[T]) ParseParams(pathBytes []byte) []string {
 
 	if len(t.Keys) == 0 {
 		return nil
@@ -68,7 +68,7 @@ func (t *trie[T]) ParseParams(pathBytes []byte) []string {
 	return res
 }
 
-func (t *trie[T]) Insert(path string, data T) {
+func (t *Trie[T]) Insert(path string, data T) {
 
 	mux.Lock()
 	defer mux.Unlock()
@@ -134,18 +134,18 @@ func (t *trie[T]) Insert(path string, data T) {
 			ka = append(ka, bytesToString(k))
 		}
 
-		var p *trie[T]
+		var p *Trie[T]
 
 		if t.children == nil {
-			t.children = &[SC]*trie[T]{}
+			t.children = &[SC]*Trie[T]{}
 		}
 
 		if t.children[c] != nil {
 			p = t.children[c]
 		} else {
-			p = new(trie[T])
+			p = new(Trie[T])
 			p.parent = t
-			p.children = &[SC]*trie[T]{}
+			p.children = &[SC]*Trie[T]{}
 			p.char = c
 			t.childrenCount++
 		}
@@ -208,7 +208,7 @@ func formatPath(pathBytes []byte) []byte {
 	return res
 }
 
-func getFormatValue[T any](t *trie[T], pathBytes []byte) *trie[T] {
+func getFormatValue[T any](t *Trie[T], pathBytes []byte) *Trie[T] {
 
 	var n = t.children
 
@@ -239,7 +239,7 @@ func getFormatValue[T any](t *trie[T], pathBytes []byte) *trie[T] {
 
 }
 
-func (t *trie[T]) Delete(path string) {
+func (t *Trie[T]) Delete(path string) {
 
 	mux.Lock()
 	defer mux.Unlock()
@@ -265,7 +265,7 @@ func (t *trie[T]) Delete(path string) {
 	}
 }
 
-func (t *trie[T]) GetValue(pathBytes []byte) *trie[T] {
+func (t *Trie[T]) GetValue(pathBytes []byte) *Trie[T] {
 
 	var n = t.children
 
@@ -374,7 +374,7 @@ func (t *trie[T]) GetValue(pathBytes []byte) *trie[T] {
 	return nil
 }
 
-func fn[T any](node *trie[T], res *[]*trie[T]) {
+func fn[T any](node *Trie[T], res *[]*Trie[T]) {
 	if node == nil {
 		return
 	}
@@ -398,8 +398,8 @@ func bytesToString(b []byte) string {
 	return *(*string)(unsafe.Pointer(&b))
 }
 
-func (t *trie[T]) GetAllValue() []*trie[T] {
-	var res []*trie[T]
+func (t *Trie[T]) GetAllValue() []*Trie[T] {
+	var res []*Trie[T]
 	fn(t, &res)
 	return res
 }

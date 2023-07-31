@@ -241,9 +241,6 @@ func getFormatValue[T any](t *Trie[T], pathBytes []byte) *Trie[T] {
 
 func (t *Trie[T]) Delete(path string) {
 
-	mux.Lock()
-	defer mux.Unlock()
-
 	var pathBytes = stringToBytes(path)
 
 	var node = t.GetValue(pathBytes)

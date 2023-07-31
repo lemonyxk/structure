@@ -203,6 +203,16 @@ func (n *Node[T]) GetAllValue() []*Node[T] {
 	return result
 }
 
+func (n *Node[T]) Delete(path string) {
+
+	var node = n.GetValue(path)
+	if node == nil {
+		return
+	}
+
+	node.HasValue = false
+}
+
 var pathArr = make([]string, 0, 128)
 
 func Split(path string) []string {

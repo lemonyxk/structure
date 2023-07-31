@@ -52,3 +52,23 @@ func BenchmarkTireTest(b *testing.B) {
 		n1.getValue(string(p))
 	}
 }
+
+var n2 = New[int]()
+
+func init() {
+	n2.Insert("/resource/:type/:hash/:name", -1)
+	n2.Insert("/resource/:type/delete", -2)
+	n2.Insert("/hello/:username/:adda", -111)
+	n2.Insert("/hello/:username/:adda/b", 1)
+	n2.Insert("/hello/:username/:adda/c", 2)
+	n2.Insert("/hello/:username/:adda/d", 3)
+	n2.Insert("/hello/:username/:adda/e", 4)
+	n2.Insert("/hello/:username/:adda/f", 5)
+	n2.Insert("/a/b/*", 6)
+}
+
+func BenchmarkTireTest2(b *testing.B) {
+	for i := 0; i < b.N; i++ {
+		n2.GetValue("/a/b/image")
+	}
+}

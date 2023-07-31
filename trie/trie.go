@@ -22,11 +22,11 @@ const XG uint8 = 47
 const SC uint8 = 255
 const WH uint8 = 63
 
-var mux sync.Mutex
+var mux sync.RWMutex
 
-func New[T any]() *Trie[T] {
-	return &Trie[T]{}
-}
+//func New[T any]() *Trie[T] {
+//	return &Trie[T]{}
+//}
 
 type Trie[T any] struct {
 	children      *[SC]*Trie[T]
@@ -266,6 +266,9 @@ func (t *Trie[T]) Delete(path string) {
 }
 
 func (t *Trie[T]) GetValue(pathBytes []byte) *Trie[T] {
+
+	mux.RLock()
+	defer mux.RUnlock()
 
 	var n = t.children
 

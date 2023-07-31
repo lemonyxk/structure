@@ -101,6 +101,9 @@ func (n *Node[T]) Insert(path string, data T) {
 
 func (n *Node[T]) ParseParams(path string) map[string]string {
 
+	lock.Lock()
+	defer lock.Unlock()
+
 	var result = make(map[string]string)
 
 	var pathArray = Split1(path)
@@ -131,8 +134,8 @@ func (n *Node[T]) ParseParams(path string) map[string]string {
 
 func (n *Node[T]) GetValue(path string) *Node[T] {
 
-	lock.RLock()
-	defer lock.RUnlock()
+	lock.Lock()
+	defer lock.Unlock()
 
 	var pathArray = Split1(path)
 
@@ -181,8 +184,8 @@ func (n *Node[T]) GetValue(path string) *Node[T] {
 
 func (n *Node[T]) GetAllValue() []*Node[T] {
 
-	lock.RLock()
-	defer lock.RUnlock()
+	lock.Lock()
+	defer lock.Unlock()
 
 	var result []*Node[T]
 

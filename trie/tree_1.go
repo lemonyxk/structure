@@ -36,7 +36,7 @@ func (n *Node[T]) Insert(path string, data T) {
 	lock.Lock()
 	defer lock.Unlock()
 
-	var pathArray = Split(path)
+	var pathArray = Split1(path)
 
 	if len(pathArray) > 128 {
 		panic("path is too long")
@@ -103,15 +103,16 @@ func (n *Node[T]) ParseParams(path string) map[string]string {
 
 	var result = make(map[string]string)
 
-	var pathArray = Split(path)
+	var pathArray = Split1(path)
 
-	var nodePathArray = Split(n.Path)
+	var nodePathArray = Split2(n.Path)
 
 	if len(pathArray) != len(nodePathArray) {
 		return result
 	}
 
 	for i := 0; i < len(pathArray); i++ {
+
 		if pathArray[i] == "" {
 			continue
 		}
@@ -133,7 +134,7 @@ func (n *Node[T]) GetValue(path string) *Node[T] {
 	lock.RLock()
 	defer lock.RUnlock()
 
-	var pathArray = Split(path)
+	var pathArray = Split1(path)
 
 	var node = n
 
@@ -213,34 +214,65 @@ func (n *Node[T]) Delete(path string) {
 	node.HasValue = false
 }
 
-var pathArr = make([]string, 0, 128)
+var pathArr1 = make([]string, 0, 128)
+var pathArr2 = make([]string, 0, 128)
 
-func Split(path string) []string {
-	pathArr = pathArr[:0]
+func Split1(path string) []string {
+	pathArr1 = pathArr1[:0]
 
 	var index = 0
 
 	for i, v := range path {
 		if v == '/' && i == 0 {
-			pathArr = append(pathArr, "/")
+			pathArr1 = append(pathArr1, "/")
 			index = i
 			continue
 		}
 
 		if v == '/' && i != 0 {
 			if i-index > 1 {
-				pathArr = append(pathArr, path[index+1:i])
+				pathArr1 = append(pathArr1, path[index+1:i])
 			}
-			pathArr = append(pathArr, "/")
+			pathArr1 = append(pathArr1, "/")
 			index = i
 		}
 
 		if i == len(path)-1 {
 			if i-index > 0 {
-				pathArr = append(pathArr, path[index+1:])
+				pathArr1 = append(pathArr1, path[index+1:])
 			}
 		}
 	}
 
-	return pathArr
+	return pathArr1
+}
+
+func Split2(path string) []string {
+	pathArr2 = pathArr2[:0]
+
+	var index = 0
+
+	for i, v := range path {
+		if v == '/' && i == 0 {
+			pathArr2 = append(pathArr2, "/")
+			index = i
+			continue
+		}
+
+		if v == '/' && i != 0 {
+			if i-index > 1 {
+				pathArr2 = append(pathArr2, path[index+1:i])
+			}
+			pathArr2 = append(pathArr2, "/")
+			index = i
+		}
+
+		if i == len(path)-1 {
+			if i-index > 0 {
+				pathArr2 = append(pathArr2, path[index+1:])
+			}
+		}
+	}
+
+	return pathArr2
 }

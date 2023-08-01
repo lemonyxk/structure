@@ -1,405 +1,281 @@
 /**
-* @program: lemo
+* @program: structure
 *
 * @description:
 *
 * @author: lemo
 *
-* @create: 2019-12-26 19:12
+* @create: 2023-08-01 00:05
 **/
 
 package trie
 
 import (
 	"fmt"
-	"strings"
 	"sync"
-	"unsafe"
 )
 
-const FH uint8 = 58
-const XG uint8 = 47
-const SC uint8 = 255
-const WH uint8 = 63
+var mux = new(sync.RWMutex)
 
-var mux sync.RWMutex
-
-//func New[T any]() *Trie[T] {
-//	return &Trie[T]{}
-//}
-
-type Trie[T any] struct {
-	children      *[SC]*Trie[T]
-	parent        *Trie[T]
-	char          byte
-	childrenCount uint8
-	Keys          []string
-	Path          []byte
-	Data          T
+type Node[T any] struct {
+	Children    map[string]*Node[T]
+	Path        string
+	Data        T
+	Placeholder string
+	HasValue    bool
 }
 
-func (t *Trie[T]) ParseParams(pathBytes []byte) []string {
-
-	if len(t.Keys) == 0 {
-		return nil
+func New[T any]() *Node[T] {
+	return &Node[T]{
+		Children: make(map[string]*Node[T]),
 	}
-
-	var pathArray = strings.Split(bytesToString(pathBytes), string(XG))
-
-	var res []string
-
-	var i = 1
-
-	var bLen = len(t.Path) - 1
-
-	for index, value := range t.Path {
-
-		if value == XG && index != bLen && t.Path[index+1] == FH {
-			res = append(res, pathArray[i])
-			i++
-			continue
-		}
-
-		if value == XG {
-			i++
-		}
-	}
-
-	return res
 }
 
-func (t *Trie[T]) Insert(path string, data T) {
+func (n *Node[T]) Insert(path string, data T) {
 
 	mux.Lock()
 	defer mux.Unlock()
 
-	if path == "" {
+	var pathArray = Split1(path)
+
+	if len(pathArray) > 128 {
+		panic("path is too long")
+	}
+
+	if len(pathArray) == 0 {
 		panic("path is empty")
 	}
 
-	var pathBytes = stringToBytes(path)
+	var node = n
 
-	if pathBytes[0] != XG {
-		panic(fmt.Sprintf("path must start with [%s]", string(XG)))
-	}
+	for i := 0; i < len(pathArray); i++ {
+		var out = false
 
-	// include ?
-	if strings.Index(path, string(WH)) != -1 {
-		panic(fmt.Sprintf("%s is include [%s]", path, string(WH)))
-	}
-
-	// repeat router
-	if h := getFormatValue(t, formatPath(pathBytes)); h != nil {
-		panic(fmt.Sprintf("%s is conflict with %s", path, h.Path))
-	}
-
-	var t1 = t
-
-	var k []byte
-
-	var ka []string
-
-	var s = true
-
-	for index := range pathBytes {
-
-		var c = pathBytes[index]
-
-		// if c > SC {
-		//	panic(fmt.Sprintf("%s include special characters %s", path, string(c)))
-		// }
-
-		if c == FH && (index != 0 && pathBytes[index-1] == XG) {
-			s = false
-			if index == len(pathBytes)-1 || (index != 0 && pathBytes[index+1] == XG) {
-				panic(fmt.Sprintf("%s is invalid, after [:] do not have any var", path))
-			}
+		if pathArray[i] == "" {
 			continue
 		}
 
-		if s == false {
-			k = append(k, c)
-			if index == len(pathBytes)-1 || (index != 0 && pathBytes[index+1] == XG) {
-				c = FH
-			} else {
-				continue
-			}
+		if node.Children == nil {
+			node.Children = make(map[string]*Node[T])
 		}
 
-		if s == false {
-			c = FH
-		}
-
-		if k != nil {
-			ka = append(ka, bytesToString(k))
-		}
-
-		var p *Trie[T]
-
-		if t.children == nil {
-			t.children = &[SC]*Trie[T]{}
-		}
-
-		if t.children[c] != nil {
-			p = t.children[c]
-		} else {
-			p = new(Trie[T])
-			p.parent = t
-			p.children = &[SC]*Trie[T]{}
-			p.char = c
-			t.childrenCount++
-		}
-
-		if index == len(pathBytes)-1 {
-			p.Keys = ka
-			p.Path = pathBytes
-			p.Data = data
-		}
-
-		t.children[c] = p
-
-		t = p
-		k = nil
-		s = true
-
-	}
-
-	t = t1
-
-}
-
-func formatPath(pathBytes []byte) []byte {
-
-	if pathBytes == nil || len(pathBytes) == 0 {
-		return nil
-	}
-
-	if pathBytes[0] != XG {
-		return nil
-	}
-
-	if len(pathBytes) == 1 {
-		return []byte{XG}
-	}
-
-	var res []byte
-
-	var s = true
-
-	for index := range pathBytes {
-		var c = pathBytes[index]
-
-		if c == FH && pathBytes[index-1] == XG {
-			res = append(res, c)
-			s = false
-			continue
-		}
-
-		if c == XG {
-			s = true
-		}
-
-		if s == true {
-			res = append(res, pathBytes[index])
-		}
-
-	}
-
-	return res
-}
-
-func getFormatValue[T any](t *Trie[T], pathBytes []byte) *Trie[T] {
-
-	var n = t.children
-
-	if t.childrenCount == 0 {
-		return nil
-	}
-
-	for index := range pathBytes {
-
-		var c = pathBytes[index]
-
-		if n[c] == nil {
-			return nil
-		}
-
-		if n[c].char != 0 {
-
-			if index == len(pathBytes)-1 && n[c].Path != nil {
-				return n[c]
+		switch pathArray[i][0] {
+		case ':':
+			if _, ok := node.Children[":"]; !ok {
+				node.Children[":"] = &Node[T]{
+					Placeholder: pathArray[i][1:],
+				}
 			}
 
-			n = n[c].children
+			node = node.Children[":"]
+
+		case '*':
+			if _, ok := node.Children["*"]; !ok {
+				node.Children["*"] = &Node[T]{}
+			}
+
+			node = node.Children["*"]
+
+			out = true // * must be the last one
+		default:
+			if _, ok := node.Children[pathArray[i]]; !ok {
+				node.Children[pathArray[i]] = &Node[T]{}
+			}
+
+			node = node.Children[pathArray[i]]
 		}
 
-	}
-
-	return nil
-
-}
-
-func (t *Trie[T]) Delete(path string) {
-
-	var pathBytes = stringToBytes(path)
-
-	var node = t.GetValue(pathBytes)
-
-	if node == nil {
-		return
-	}
-
-	for {
-
-		node.parent.childrenCount--
-		node.parent.children[node.char] = nil
-
-		node = node.parent
-
-		if node.parent == nil || node.childrenCount != 0 {
+		if out {
 			break
 		}
 	}
-}
 
-func (t *Trie[T]) GetValue(pathBytes []byte) *Trie[T] {
-
-	mux.RLock()
-	defer mux.RUnlock()
-
-	var n = t.children
-
-	if t.childrenCount == 0 {
-		return nil
+	if node.HasValue {
+		panic(fmt.Sprintf("path %s is conflict with %s", path, node.Path))
 	}
 
-	var bLen = len(pathBytes) - 1
+	node.HasValue = true
+	node.Data = data
+	node.Path = path
+}
 
-	var f = true
+func (n *Node[T]) ParseParams(path string) map[string]string {
 
-	for index := range pathBytes {
+	mux.Lock()
+	defer mux.Unlock()
 
-		// c == : ?
+	var result = make(map[string]string)
 
-		var c = pathBytes[index]
+	var pathArray = Split1(path)
 
-		if c == FH {
+	var nodePathArray = Split2(n.Path)
 
-			// is the latest char ?
-			if index == bLen {
+	if len(pathArray) != len(nodePathArray) {
+		return result
+	}
 
-				if n[FH] != nil && n[FH].Path != nil {
-					return n[FH]
-				}
+	for i := 0; i < len(pathArray); i++ {
 
-				return nil
-			}
-
+		if pathArray[i] == "" {
 			continue
 		}
 
-		if n[c] == nil || f == false {
-
-			f = false
-
-			// is /
-			if c == XG {
-
-				// is the latest char ?
-				if index == bLen {
-
-					if n[FH] == nil {
-						return nil
-					}
-
-					if n[FH].children[XG] == nil {
-						return nil
-					}
-
-					if n[FH].children[XG].Path == nil {
-						return nil
-					}
-
-					// remove / index
-					return n[FH].children[XG]
-				}
-
-				// not the latest char
-				// return nil
-				if n[FH] == nil {
-					return nil
-				}
-
-				// not children return nil
-				if n[FH].children[XG] == nil {
-					return nil
-				}
-
-				// reset n
-				n = n[FH].children[XG].children
-
-				f = true
-
-				continue
-
-			}
-
-			// is the latest char ?
-			if index == bLen {
-				if n[FH] != nil && n[FH].Path != nil {
-					return n[FH]
-				}
-
-				return nil
-			}
-
-			if n[FH] == nil {
-				return nil
-			}
-
+		if nodePathArray[i] == "" {
 			continue
 		}
 
-		if n[c].char != 0 {
-			if index == bLen && n[c].Path != nil {
-				return n[c]
-			}
-
-			n = n[c].children
-
-			f = true
+		if nodePathArray[i][0] == ':' {
+			result[nodePathArray[i][1:]] = pathArray[i]
 		}
 	}
 
-	return nil
+	return result
 }
 
-func fn[T any](node *Trie[T], res *[]*Trie[T]) {
+func (n *Node[T]) GetValue(path string) *Node[T] {
+
+	mux.Lock()
+	defer mux.Unlock()
+
+	var pathArray = Split1(path)
+
+	var node = n
+
+	var fail *Node[T]
+
+	for i := 0; i < len(pathArray); i++ {
+		if pathArray[i] == "" {
+			continue
+		}
+
+		if node.Children == nil {
+			break
+		}
+
+		var _, ok = node.Children[pathArray[i]]
+		if ok {
+			node = node.Children[pathArray[i]]
+			continue
+		} else {
+			// if not found, try to find *
+			var _, ok1 = node.Children["*"]
+			if ok1 {
+				// if found, set fail to *
+				if fail == nil { // only set once
+					fail = node.Children["*"]
+				}
+			}
+		}
+
+		// if not found, try to find :
+		var _, ok2 = node.Children[":"]
+		if ok2 {
+			node = node.Children[":"]
+			continue
+		}
+	}
+
+	if !node.HasValue { // if not found, return fail
+		return fail
+	}
+
+	return node
+}
+
+func (n *Node[T]) GetAllValue() []*Node[T] {
+
+	mux.Lock()
+	defer mux.Unlock()
+
+	var result []*Node[T]
+
+	var fn func(node *Node[T])
+
+	fn = func(node *Node[T]) {
+		if node.Children == nil {
+			result = append(result, node)
+			return
+		}
+
+		for _, value := range node.Children {
+			fn(value)
+		}
+	}
+
+	fn(n)
+
+	return result
+}
+
+func (n *Node[T]) Delete(path string) {
+
+	var node = n.GetValue(path)
 	if node == nil {
 		return
 	}
-	for i := 0; i < len(node.children); i++ {
-		if node.children[i] != nil {
-			if len(node.children[i].Path) != 0 {
-				*res = append(*res, node.children[i])
+
+	node.HasValue = false
+}
+
+var pathArr1 = make([]string, 0, 128)
+var pathArr2 = make([]string, 0, 128)
+
+func Split1(path string) []string {
+	pathArr1 = pathArr1[:0]
+
+	var index = 0
+
+	for i, v := range path {
+		if v == '/' && i == 0 {
+			pathArr1 = append(pathArr1, "/")
+			index = i
+			continue
+		}
+
+		if v == '/' && i != 0 {
+			if i-index > 1 {
+				pathArr1 = append(pathArr1, path[index+1:i])
 			}
-			fn(node.children[i], res)
+			pathArr1 = append(pathArr1, "/")
+			index = i
+		}
+
+		if i == len(path)-1 {
+			if i-index > 0 {
+				pathArr1 = append(pathArr1, path[index+1:])
+			}
 		}
 	}
+
+	return pathArr1
 }
 
-func stringToBytes(s string) []byte {
-	x := (*[2]uintptr)(unsafe.Pointer(&s))
-	h := [3]uintptr{x[0], x[1], x[1]}
-	return *(*[]byte)(unsafe.Pointer(&h))
-}
+func Split2(path string) []string {
+	pathArr2 = pathArr2[:0]
 
-func bytesToString(b []byte) string {
-	return *(*string)(unsafe.Pointer(&b))
-}
+	var index = 0
 
-func (t *Trie[T]) GetAllValue() []*Trie[T] {
-	var res []*Trie[T]
-	fn(t, &res)
-	return res
+	for i, v := range path {
+		if v == '/' && i == 0 {
+			pathArr2 = append(pathArr2, "/")
+			index = i
+			continue
+		}
+
+		if v == '/' && i != 0 {
+			if i-index > 1 {
+				pathArr2 = append(pathArr2, path[index+1:i])
+			}
+			pathArr2 = append(pathArr2, "/")
+			index = i
+		}
+
+		if i == len(path)-1 {
+			if i-index > 0 {
+				pathArr2 = append(pathArr2, path[index+1:])
+			}
+		}
+	}
+
+	return pathArr2
 }
